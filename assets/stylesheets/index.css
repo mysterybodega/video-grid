@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css?family=IBM+Plex+Mono');
+
 html, body {
   height: 100%;
   margin: 0;
@@ -25,16 +27,28 @@ body {
 .container__grid {}
 
 .container__canvas {
+  position: absolute;
   visibility: hidden;
+}
+
+.info,
+.nav {
+  color: white;
+  display: flex;
+  flex-direction: column;
+  font-family: 'IBM Plex Mono', monospace;
+  position: fixed;
+}
+
+.info {
+  align-items: flex-start;
+  left: 25px;
+  top: 15px;
 }
 
 .nav {
   align-items: flex-end;
   bottom: 15px;
-  display: flex;
-  flex-direction: column;
-  font-family: 'IBM Plex Mono', monospace;
-  position: fixed;
   right: 25px;
 }
 

@@ -1,3 +1,3 @@
 # CSS Video Grid
 
-An HTML5 video to CSS Grid experiment.
+An experiment to transform HTML5 video into a pure CSS grid.
