@@ -1,0 +1,51 @@
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  align-items: center;
+  background: black;
+  display: flex;
+  justify-content: center;
+}
+
+.container {
+  position: relative;
+}
+
+.container__video {
+  border: 1px solid black;
+  left: 20px;
+  position: absolute;
+  top: 20px;
+}
+
+.container__grid {}
+
+.container__canvas {
+  visibility: hidden;
+}
+
+.nav {
+  align-items: flex-end;
+  bottom: 15px;
+  display: flex;
+  flex-direction: column;
+  font-family: 'IBM Plex Mono', monospace;
+  position: fixed;
+  right: 25px;
+}
+
+.nav a {
+  color: white;
+  font-size: 15px;
+  line-height: 30px;
+  text-decoration: none;
+}
+
+.nav a:hover {
+  text-decoration: line-through;
+}
+
