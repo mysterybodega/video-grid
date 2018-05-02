@@ -5,14 +5,14 @@ var video = document.getElementById('video');
 
 function setCSS(elem, style) {
   _.each(style, (v, k) => {
-    elem.attributeStyleMap.set(k, v);
+    elem.style[k] = v;
   });
 }
 
 var x = 0, y = 0, h = 60, w = 80;
 
-setCSS(video, { height: CSS.px(h), width: CSS.px(w) });
-setCSS(canvas, { height: CSS.px(h), width: CSS.px(w) });
+setCSS(video, { height: h + 'px', width: w + 'px' });
+setCSS(canvas, { height: h + 'px', width: w + 'px' });
 
 navigator.mediaDevices.getUserMedia({ video: true }).then(stream => {
   video.src = window.URL.createObjectURL(stream);
@@ -26,10 +26,11 @@ function drawGrid(image, grid) {
   var n = 10;
   var gridCSS = {
     'display': 'grid',
-    'height': CSS.px(image.height * n),
-    'width': CSS.px(image.width * n),
+    'height': image.height * n + 'px',
+    'width': image.width * n + 'px',
     'grid-template-columns': _.repeat('1fr ', image.width),
-    'grid-template-rows': 'auto'
+    'grid-template-rows': 'auto',
+    'grid-gap': '1px'
   };
 
   setCSS(grid, gridCSS);

@@ -17,9 +17,9 @@ body {
 
 .container__video {
   border: 1px solid black;
-  left: 20px;
+  left: 19px;
   position: absolute;
-  top: 20px;
+  top: 19px;
 }
 
 .container__grid {}
