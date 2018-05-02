@@ -14,11 +14,6 @@ var x = 0, y = 0, h = 60, w = 80;
 setCSS(video, { height: h + 'px', width: w + 'px' });
 setCSS(canvas, { height: h + 'px', width: w + 'px' });
 
-navigator.mediaDevices.getUserMedia({ video: true }).then(stream => {
-  video.src = window.URL.createObjectURL(stream);
-  video.play();
-});
-
 function drawGrid(image, grid) {
   var pixels = _.map(_.chunk(image.data, 4), (p) => [p[0], p[1], p[2]]);
   var matrix = _.chunk(pixels, image.width);
@@ -60,4 +55,12 @@ function step() {
   _.defer(step);
 }
 
-window.requestAnimationFrame(step);
+if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+  navigator.mediaDevices.getUserMedia({ video: true }).then(stream => {
+    video.src = window.URL.createObjectURL(stream);
+    video.play();
+  });
+  window.requestAnimationFrame(step);
+} else {
+  alert('Error accessing camera API. Try using the latest version of Chrome or Firefox.');
+}
