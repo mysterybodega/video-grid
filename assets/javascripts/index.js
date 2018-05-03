@@ -1,66 +1,98 @@
-var button = document.getElementById('button');
-var canvas = document.getElementById('canvas');
-var grid = document.getElementById('grid');
-var video = document.getElementById('video');
+var css = {
+  px: function(n) {
+    return n + 'px';
+  },
+  rgb: function(colors) {
+    return 'rgb(' + _.join(colors, ', ') + ')';
+  },
+  set: function(e, rules) {
+    _.each(rules, (v, k) => e.style[k] = v);
+  }
+};
 
-function setCSS(elem, style) {
-  _.each(style, (v, k) => {
-    elem.style[k] = v;
-  });
-}
-
-var x = 0, y = 0, h = 60, w = 80;
-
-setCSS(video, { height: h + 'px', width: w + 'px' });
-setCSS(canvas, { height: h + 'px', width: w + 'px' });
-
-function drawGrid(image, grid) {
+function drawGrid(image) {
+  var grid = document.getElementById('grid');
   var pixels = _.map(_.chunk(image.data, 4), (p) => [p[0], p[1], p[2]]);
   var matrix = _.chunk(pixels, image.width);
-
   var n = 10;
   var gridCSS = {
-    'display': 'grid',
-    'height': image.height * n + 'px',
-    'width': image.width * n + 'px',
-    'grid-template-columns': _.repeat('1fr ', image.width),
-    'grid-template-rows': 'auto',
-    'grid-gap': '1px'
+    'height': css.px(image.height * n),
+    'width': css.px(image.width * n),
+    'grid-template-columns': _.repeat('1fr ', image.width)
   };
 
-  setCSS(grid, gridCSS);
+  css.set(grid, gridCSS);
 
-  while (grid.hasChildNodes()) {
-    grid.removeChild(grid.lastChild);
-  }
-
-  _.each(matrix, (row, i) => {
-    _.each(row, (pixel) => {
-      var span = document.createElement('span');
-      var spanCSS = {
-        'background': 'rgb(' + _.join(pixel, ', ') + ')'
-      };
-      setCSS(span, spanCSS);
-      grid.appendChild(span);
+  if (grid.hasChildNodes()) {
+    var i = 0;
+    _.each(matrix, row => {
+      _.each(row, pixel => {
+        css.set(grid.childNodes[i], { 'background': css.rgb(pixel) });
+        i += 1;
+      });
     });
-  });
+  } else {
+    var gridChildren = document.createDocumentFragment();
+    _.each(matrix, row => {
+      _.each(row, pixel => {
+        var span = document.createElement('span');
+        css.set(span, { 'background': css.rgb(pixel) });
+        gridChildren.append(span);
+      });
+    });
+    grid.appendChild(gridChildren);
+  }
 }
 
-function step() {
-  var context = canvas.getContext('2d');
-  context.drawImage(video, x, y, w, h);
-  var image = context.getImageData(x, y, w, h);
-  context.putImageData(image, x, y);
-  drawGrid(image, grid);
-  _.defer(step);
+function step(height, width) {
+  var canvas = document.getElementById('canvas').getContext('2d');
+  var video = document.getElementById('video');
+
+  canvas.drawImage(video, 0, 0, width, height);
+  drawGrid(canvas.getImageData(0, 0, width, height));
+
+  _.defer(() => step(height, width));
 }
 
-if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+function initGrid(height, width) {
+  window.requestAnimationFrame(() => step(height, width));
+}
+
+function initCanvas(height, width) {
+  var canvas = document.getElementById('canvas');
+  var canvasCSS = {
+    height: css.px(height * 2 - 1),
+    width: css.px(width * 2 - 1)
+  };
+
+  css.set(canvas, canvasCSS);
+}
+
+function initVideo(height, width) {
+  var video = document.getElementById('video');
+  var videoCSS = {
+    height: css.px(height * 2 - 1),
+    width: css.px(width * 2 - 1)
+  };
+
+  css.set(video, videoCSS);
+
   navigator.mediaDevices.getUserMedia({ video: true }).then(stream => {
     video.src = window.URL.createObjectURL(stream);
     video.play();
   });
-  window.requestAnimationFrame(step);
+}
+
+if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+  var height = 60;
+  var width = 80;
+
+  initCanvas(height, width);
+  initVideo(height, width);
+  initGrid(height, width);
 } else {
-  alert('Error accessing camera API. Try using the latest version of Chrome or Firefox.');
+  alert(
+    'Error accessing camera API. ' +
+    'Try using the latest version of Chrome or Firefox.'
+  );
 }
