@@ -16,9 +16,12 @@ function drawGrid(image) {
   var matrix = _.chunk(pixels, image.width);
   var n = 10;
   var gridCSS = {
+    'display': 'grid',
     'height': css.px(image.height * n),
     'width': css.px(image.width * n),
-    'grid-template-columns': _.repeat('1fr ', image.width)
+    'grid-template-columns': _.repeat('1fr ', image.width),
+    'grid-template-rows': 'auto',
+    'grid-gap': css.px(1)
   };
 
   css.set(grid, gridCSS);
@@ -62,6 +65,8 @@ function initCanvas(height, width) {
   var canvas = document.getElementById('canvas');
   var canvasCSS = {
     height: css.px(height * 2 - 1),
+    position: 'absolute',
+    visibility: 'hidden',
     width: css.px(width * 2 - 1)
   };
 
@@ -71,9 +76,15 @@ function initCanvas(height, width) {
 function initVideo(height, width) {
   var video = document.getElementById('video');
   var videoCSS = {
+    border: css.px(1) + ' solid black',
     height: css.px(height * 2 - 1),
+    left: css.px(19),
+    position: 'absolute',
+    top: css.px(19),
     width: css.px(width * 2 - 1)
   };
+
+  video.parentNode.style.position = 'relative';
 
   css.set(video, videoCSS);
 

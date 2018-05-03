@@ -13,30 +13,8 @@ body {
   justify-content: center;
 }
 
-.container {
-  position: relative;
-}
-
-.container__video {
-  border: 1px solid black;
-  left: 19px;
-  position: absolute;
-  top: 19px;
-}
-
-.container__grid {
-  display: grid;
-  grid-gap: 1px;
-  grid-template-rows: auto;
-}
-
-.container__canvas {
-  position: absolute;
-  visibility: hidden;
-}
-
-.info,
-.nav {
+header,
+footer {
   color: white;
   display: flex;
   flex-direction: column;
@@ -44,26 +22,25 @@ body {
   position: fixed;
 }
 
-.info {
+header {
   align-items: flex-start;
   left: 25px;
   top: 15px;
 }
 
-.nav {
+footer {
   align-items: flex-end;
   bottom: 15px;
   right: 25px;
 }
 
-.nav a {
+footer a {
   color: white;
   font-size: 15px;
   line-height: 30px;
   text-decoration: none;
 }
 
-.nav a:hover {
+footer a:hover {
   text-decoration: line-through;
 }
-
