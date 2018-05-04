@@ -88,10 +88,17 @@ function initVideo(height, width) {
 
   css.set(video, videoCSS);
 
-  navigator.mediaDevices.getUserMedia({ video: true }).then(stream => {
-    video.src = window.URL.createObjectURL(stream);
-    video.play();
-  });
+  var userMediaConfig = { audio: false, video: true };
+
+  navigator.mediaDevices.getUserMedia(userMediaConfig).then(
+    (stream) => {
+      video.srcObject = stream;
+      video.play();
+    },
+    (error) => {
+      console.log(error);
+    }
+  );
 }
 
 if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
