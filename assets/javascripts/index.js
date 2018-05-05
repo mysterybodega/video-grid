@@ -76,12 +76,13 @@ function initCanvas(height, width) {
 function initVideo(height, width) {
   var video = document.getElementById('video');
   var videoCSS = {
-    border: css.px(1) + ' solid black',
-    height: css.px(height * 2 - 1),
-    left: css.px(19),
-    position: 'absolute',
-    top: css.px(19),
-    width: css.px(width * 2 - 1)
+    'border': css.px(1) + ' solid black',
+    'height': css.px(height * 2 - 1),
+    'left': css.px(19),
+    'position': 'absolute',
+    'top': css.px(19),
+    'width': css.px(width * 2 - 1),
+    'z-index': 10
   };
 
   video.parentNode.style.position = 'relative';
