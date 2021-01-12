@@ -1,3 +1,3 @@
 # Video Grid
 
-An experiment to transform HTML5 video into a pure CSS grid.
+[Demo](https://mysterybodega.github.io/video-grid)
