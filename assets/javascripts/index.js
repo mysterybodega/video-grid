@@ -63,7 +63,7 @@ class GridComponent extends React.Component {
   }
 
   componentDidMount() {
-    window.requestAnimationFrame(() => this.tick());
+    window.requestAnimationFrame(this.tick.bind(this));
   }
 
   tick() {
@@ -73,7 +73,7 @@ class GridComponent extends React.Component {
     canvas.drawImage(video, 0, 0, this.state.width, this.state.height);
     this.updateGrid(canvas.getImageData(0, 0, this.state.width, this.state.height));
 
-    _.defer(() => this.tick());
+    _.defer(this.tick.bind(this));
   }
 
   updateGrid(image) {
