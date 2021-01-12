@@ -1,117 +1,104 @@
-var css = {
-  px: function(n) {
-    return n + 'px';
-  },
-  rgb: function(colors) {
-    return 'rgb(' + _.join(colors, ', ') + ')';
-  },
-  set: function(e, rules) {
-    _.each(rules, (v, k) => e.style[k] = v);
-  }
-};
+class App extends React.Component {
+  render() {
+    let height = 60
+    let width = 80
 
-function drawGrid(image) {
-  var grid = document.getElementById('grid');
-  var pixels = _.map(_.chunk(image.data, 4), (p) => [p[0], p[1], p[2]]);
-  var matrix = _.chunk(pixels, image.width);
-  var n = 10;
-  var gridCSS = {
-    'display': 'grid',
-    'height': css.px(image.height * n),
-    'width': css.px(image.width * n),
-    'grid-template-columns': _.repeat('1fr ', image.width),
-    'grid-template-rows': 'auto',
-    'grid-gap': css.px(1)
-  };
-
-  css.set(grid, gridCSS);
-
-  if (grid.hasChildNodes()) {
-    var i = 0;
-    _.each(matrix, row => {
-      _.each(row, pixel => {
-        css.set(grid.childNodes[i], { 'background': css.rgb(pixel) });
-        i += 1;
-      });
-    });
-  } else {
-    var gridChildren = document.createDocumentFragment();
-    _.each(matrix, row => {
-      _.each(row, pixel => {
-        var span = document.createElement('span');
-        css.set(span, { 'background': css.rgb(pixel) });
-        gridChildren.append(span);
-      });
-    });
-    grid.appendChild(gridChildren);
+    return (
+      <div style={{position: 'relative'}}>
+        <CanvasComponent height={height} width={width} />
+        <VideoComponent height={height} width={width} />
+        <GridComponent height={height} width={width} />
+      </div>
+    );
   }
 }
 
-function step(height, width) {
-  var canvas = document.getElementById('canvas').getContext('2d');
-  var video = document.getElementById('video');
-
-  canvas.drawImage(video, 0, 0, width, height);
-  drawGrid(canvas.getImageData(0, 0, width, height));
-
-  _.defer(() => step(height, width));
-}
-
-function initGrid(height, width) {
-  window.requestAnimationFrame(() => step(height, width));
-}
-
-function initCanvas(height, width) {
-  var canvas = document.getElementById('canvas');
-  var canvasCSS = {
-    height: css.px(height * 2 - 1),
+function CanvasComponent(props) {
+  let css = {
     position: 'absolute',
     visibility: 'hidden',
-    width: css.px(width * 2 - 1)
+    height: `${props.height * 2 - 1}px`,
+    width: `${props.width * 2 - 1}px`,
   };
 
-  css.set(canvas, canvasCSS);
+  return <canvas id="canvas" style={css}></canvas>;
 }
 
-function initVideo(height, width) {
-  var video = document.getElementById('video');
-  var videoCSS = {
-    'border': css.px(1) + ' solid black',
-    'height': css.px(height * 2 - 1),
-    'left': css.px(19),
-    'position': 'absolute',
-    'top': css.px(19),
-    'width': css.px(width * 2 - 1),
-    'z-index': 10
+function VideoComponent(props) {
+  let css = {
+    position: 'absolute',
+    top: '19px',
+    left: '19px',
+    zIndex: 10,
+    height: `${props.height * 2 - 1}px`,
+    width: `${props.width * 2 - 1}px`,
+    border: '1px solid black',
   };
+  let userMediaConfig = { audio: false, video: true };
 
-  video.parentNode.style.position = 'relative';
+  navigator.mediaDevices.getUserMedia(userMediaConfig).then(stream => {
+    video.srcObject = stream;
+    video.play();
+  }, alert);
 
-  css.set(video, videoCSS);
-
-  var userMediaConfig = { audio: false, video: true };
-
-  navigator.mediaDevices.getUserMedia(userMediaConfig).then(
-    (stream) => {
-      video.srcObject = stream;
-      video.play();
-    },
-    (error) => {
-      console.log(error);
-    }
-  );
+  return <video id="video" autoPlay style={css}></video>;
 }
 
-if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-  var height = 60;
-  var width = 80;
+class GridComponent extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      height: props.height,
+      width: props.width,
+      gridCss: {
+        display: 'grid',
+        height: `${props.height * 10}px`,
+        width: `${props.width * 10}px`,
+        gridTemplateColumns: _.repeat('1fr ', props.width),
+        gridTemplateRows: 'auto',
+        gridGap: '1px'
+      },
+      data: [],
+    };
+  }
 
-  initCanvas(height, width);
-  initVideo(height, width);
-  initGrid(height, width);
+  componentDidMount() {
+    window.requestAnimationFrame(() => this.step());
+  }
+
+  step() {
+    let canvas = document.getElementById('canvas').getContext('2d');
+    let video = document.getElementById('video');
+
+    canvas.drawImage(video, 0, 0, this.state.width, this.state.height);
+    this.updateGrid(canvas.getImageData(0, 0, this.state.width, this.state.height));
+
+    _.defer(() => this.step());
+  }
+
+  updateGrid(image) {
+    let pixels = _.chunk(image.data, 4);
+    let data = _.chunk(pixels, image.width);
+
+    this.setState({ ...this.state, data });
+  }
+
+  render() {
+    let gridItems = this.state.data.map((row, i) =>
+      row.map((pixel, j) => {
+        let key = `${i}-${j}`;
+        let [r, g, b] = pixel;
+        let css = { background: `rgb(${r}, ${g}, ${b})` };
+        return <span key={key} style={css}></span>;
+      })
+    );
+
+    return <div id="grid" style={this.state.gridCss}>{gridItems}</div>;
+  }
+}
+
+if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+  alert('This browser does not support the Media Devices API.');
 } else {
-  alert(
-    'Error accessing camera API. ' +
-    'Try using the latest version of Chrome or Firefox.'
-  );
+  ReactDOM.render(<App />, document.getElementById('root'));
 }
