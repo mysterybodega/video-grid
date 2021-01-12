@@ -47,18 +47,16 @@ function VideoComponent(props) {
 class GridComponent extends React.Component {
   constructor(props) {
     super(props);
+    this.gridCss = {
+      display: 'grid',
+      height: `${props.height * 10}px`,
+      width: `${props.width * 10}px`,
+      gridTemplateColumns: _.repeat('1fr ', props.width),
+      gridTemplateRows: 'auto',
+      gridGap: '1px'
+    };
     this.state = {
-      height: props.height,
-      width: props.width,
-      gridCss: {
-        display: 'grid',
-        height: `${props.height * 10}px`,
-        width: `${props.width * 10}px`,
-        gridTemplateColumns: _.repeat('1fr ', props.width),
-        gridTemplateRows: 'auto',
-        gridGap: '1px'
-      },
-      data: [],
+      data: []
     };
   }
 
@@ -70,8 +68,8 @@ class GridComponent extends React.Component {
     let canvas = document.getElementById('canvas').getContext('2d');
     let video = document.getElementById('video');
 
-    canvas.drawImage(video, 0, 0, this.state.width, this.state.height);
-    this.updateGrid(canvas.getImageData(0, 0, this.state.width, this.state.height));
+    canvas.drawImage(video, 0, 0, this.props.width, this.props.height);
+    this.updateGrid(canvas.getImageData(0, 0, this.props.width, this.props.height));
 
     _.defer(this.tick.bind(this));
   }
@@ -84,17 +82,19 @@ class GridComponent extends React.Component {
   }
 
   render() {
-    let gridItems = this.state.data.map((row, i) =>
-      row.map((pixel, j) => {
-        let key = `${i}-${j}`;
-        let [r, g, b] = pixel;
-        let css = { background: `rgb(${r}, ${g}, ${b})` };
-        return <span key={key} style={css}></span>;
-      })
+    return (
+      <div id="grid" style={this.gridCss}>
+        {this.state.data.map((row, i) => row.map((pixelData, j) =>
+          <GridItemComponent key={`${i}-${j}`} pixelData={pixelData} />
+        ))}
+      </div>
     );
-
-    return <div id="grid" style={this.state.gridCss}>{gridItems}</div>;
   }
+}
+
+function GridItemComponent(props) {
+  let [r, g, b] = props.pixelData;
+  return <span style={{background: `rgb(${r}, ${g}, ${b})`}}></span>;
 }
 
 if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
