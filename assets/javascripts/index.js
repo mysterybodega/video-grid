@@ -63,24 +63,24 @@ class GridComponent extends React.Component {
   }
 
   componentDidMount() {
-    window.requestAnimationFrame(() => this.step());
+    window.requestAnimationFrame(() => this.tick());
   }
 
-  step() {
+  tick() {
     let canvas = document.getElementById('canvas').getContext('2d');
     let video = document.getElementById('video');
 
     canvas.drawImage(video, 0, 0, this.state.width, this.state.height);
     this.updateGrid(canvas.getImageData(0, 0, this.state.width, this.state.height));
 
-    _.defer(() => this.step());
+    _.defer(() => this.tick());
   }
 
   updateGrid(image) {
     let pixels = _.chunk(image.data, 4);
     let data = _.chunk(pixels, image.width);
 
-    this.setState({ ...this.state, data });
+    this.setState({ data });
   }
 
   render() {
