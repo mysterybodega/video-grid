@@ -1,57 +1,71 @@
 class App extends React.Component {
+  constructor(props) {
+    super(props);
+    this.css = {
+      position: 'relative'
+    };
+    this.dimensions = {
+      height: 60,
+      width: 80,
+    };
+    this.canvasRef = React.createRef();
+    this.videoRef = React.createRef();
+  }
+
   render() {
-    let height = 60
-    let width = 80
+    let canvas = <CanvasComponent ref={this.canvasRef} dimensions={this.dimensions} />
+    let video = <VideoComponent ref={this.videoRef} dimensions={this.dimensions} />
 
     return (
-      <div style={{position: 'relative'}}>
-        <CanvasComponent height={height} width={width} />
-        <VideoComponent height={height} width={width} />
-        <GridComponent height={height} width={width} />
+      <div style={this.css}>
+        {canvas}
+        {video}
+        <GridComponent canvas={canvas} video={video} dimensions={this.dimensions} />
       </div>
     );
   }
 }
 
-function CanvasComponent(props) {
+const CanvasComponent = React.forwardRef((props, ref) => {
   let css = {
     position: 'absolute',
     visibility: 'hidden',
-    height: `${props.height * 2 - 1}px`,
-    width: `${props.width * 2 - 1}px`,
+    height: `${props.dimensions.height * 2 - 1}px`,
+    width: `${props.dimensions.width * 2 - 1}px`,
   };
 
-  return <canvas id="canvas" style={css}></canvas>;
-}
+  return <canvas ref={ref} style={css}></canvas>;
+});
 
-function VideoComponent(props) {
+const VideoComponent = React.forwardRef((props, ref) => {
   let css = {
     position: 'absolute',
     top: '19px',
     left: '19px',
     zIndex: 10,
-    height: `${props.height * 2 - 1}px`,
-    width: `${props.width * 2 - 1}px`,
+    height: `${props.dimensions.height * 2 - 1}px`,
+    width: `${props.dimensions.width * 2 - 1}px`,
     border: '1px solid black',
   };
   let userMediaConfig = { audio: false, video: true };
 
   navigator.mediaDevices.getUserMedia(userMediaConfig).then(stream => {
+    let video = ref.current;
     video.srcObject = stream;
     video.play();
   }, alert);
 
-  return <video id="video" autoPlay style={css}></video>;
-}
+  return <video ref={ref} autoPlay style={css}></video>;
+});
 
 class GridComponent extends React.Component {
   constructor(props) {
     super(props);
     this.gridCss = {
       display: 'grid',
-      height: `${props.height * 10}px`,
-      width: `${props.width * 10}px`,
-      gridTemplateColumns: _.repeat('1fr ', props.width),
+      height: `${props.dimensions.height * 10}px`,
+      width: `${props.dimensions.width * 10}px`,
+      gridTemplateColumns: _.repeat('1fr ', props.dimensions.width),
       gridTemplateRows: 'auto',
       gridGap: '1px'
     };
@@ -65,11 +79,13 @@ class GridComponent extends React.Component {
   }
 
   tick() {
-    let canvas = document.getElementById('canvas').getContext('2d');
-    let video = document.getElementById('video');
+    let canvas = this.props.canvas.ref.current.getContext('2d');
+    let video = this.props.video.ref.current;
+    let height = this.props.dimensions.height;
+    let width = this.props.dimensions.width;
 
-    canvas.drawImage(video, 0, 0, this.props.width, this.props.height);
-    this.updateGrid(canvas.getImageData(0, 0, this.props.width, this.props.height));
+    canvas.drawImage(video, 0, 0, width, height);
+    this.updateGrid(canvas.getImageData(0, 0, width, height));
 
     _.defer(this.tick.bind(this));
   }
