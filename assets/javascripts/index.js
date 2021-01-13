@@ -37,6 +37,13 @@ const CanvasComponent = React.forwardRef((props, ref) => {
   return <canvas ref={ref} style={css}></canvas>;
 });
 
+CanvasComponent.propTypes = {
+  dimensions: PropTypes.exact({
+    height: PropTypes.number.isRequired,
+    width: PropTypes.number.isRequired,
+  }).isRequired
+};
+
 const VideoComponent = React.forwardRef((props, ref) => {
   let css = {
     position: 'absolute',
@@ -57,6 +64,13 @@ const VideoComponent = React.forwardRef((props, ref) => {
 
   return <video ref={ref} autoPlay style={css}></video>;
 });
+
+VideoComponent.propTypes = {
+  dimensions: PropTypes.exact({
+    height: PropTypes.number.isRequired,
+    width: PropTypes.number.isRequired,
+  }).isRequired
+};
 
 class GridComponent extends React.Component {
   constructor(props) {
@@ -108,10 +122,21 @@ class GridComponent extends React.Component {
   }
 }
 
+GridComponent.propTypes = {
+  dimensions: PropTypes.exact({
+    height: PropTypes.number.isRequired,
+    width: PropTypes.number.isRequired,
+  }).isRequired
+};
+
 function GridItemComponent(props) {
   let [r, g, b] = props.pixelData;
   return <span style={{background: `rgb(${r}, ${g}, ${b})`}}></span>;
 }
+
+GridItemComponent.propTypes = {
+  pixelData: PropTypes.arrayOf(PropTypes.number).isRequired,
+};
 
 if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
   alert('This browser does not support the Media Devices API.');
