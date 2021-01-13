@@ -1,29 +1,22 @@
-class App extends React.Component {
-  constructor(props) {
-    super(props);
-    this.css = {
-      position: 'relative'
-    };
-    this.dimensions = {
-      height: 60,
-      width: 80,
-    };
-    this.canvasRef = React.createRef();
-    this.videoRef = React.createRef();
-  }
+function App(props) {
+  let css = {
+    position: 'relative'
+  };
+  let dimensions = {
+    height: 60,
+    width: 80,
+  };
 
-  render() {
-    let canvas = <CanvasComponent ref={this.canvasRef} dimensions={this.dimensions} />
-    let video = <VideoComponent ref={this.videoRef} dimensions={this.dimensions} />
+  let canvasRef = React.useRef(null);
+  let videoRef = React.useRef(null);
 
-    return (
-      <div style={this.css}>
-        {canvas}
-        {video}
-        <GridComponent canvas={canvas} video={video} dimensions={this.dimensions} />
-      </div>
-    );
-  }
+  return (
+    <div style={css}>
+      <CanvasComponent ref={canvasRef} dimensions={dimensions} />
+      <VideoComponent ref={videoRef} dimensions={dimensions} />
+      <GridComponent canvasRef={canvasRef} videoRef={videoRef} dimensions={dimensions} />
+    </div>
+  );
 }
 
 const CanvasComponent = React.forwardRef((props, ref) => {
@@ -93,8 +86,8 @@ class GridComponent extends React.Component {
   }
 
   tick() {
-    let canvas = this.props.canvas.ref.current.getContext('2d');
-    let video = this.props.video.ref.current;
+    let canvas = this.props.canvasRef.current.getContext('2d');
+    let video = this.props.videoRef.current;
     let height = this.props.dimensions.height;
     let width = this.props.dimensions.width;
 
