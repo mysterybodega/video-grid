@@ -75,21 +75,17 @@ function GridComponent(props) {
   };
   let [data, setData] = React.useState([]);
 
-  React.useEffect(() => {
-    let animationId = window.requestAnimationFrame(tick);
-    return () => window.cancelAnimationFrame(animationId);
-  });
+  React.useEffect(() => updateData());
 
-  function tick() {
+  function updateData() {
+    let { height, width } = props.dimensions;
     let canvas = props.canvasRef.current.getContext('2d');
     let video = props.videoRef.current;
-    let { height, width } = props.dimensions;
     canvas.drawImage(video, 0, 0, width, height);
     let image = canvas.getImageData(0, 0, width, height);
     let pixels = _.chunk(image.data, 4);
     let data = _.chunk(pixels, image.width);
     setData(data);
-    _.defer(tick);
   }
 
   return (
