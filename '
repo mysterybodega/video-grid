@@ -76,26 +76,30 @@ function GridComponent(props) {
   let [data, setData] = React.useState([]);
 
   React.useEffect(() => {
-    let animationId = window.requestAnimationFrame(tick);
-    return () => window.cancelAnimationFrame(animationId);
+    window.requestAnimationFrame(tick);
   });
 
   function tick() {
     let canvas = props.canvasRef.current.getContext('2d');
     let video = props.videoRef.current;
-    let { height, width } = props.dimensions;
+    let height = props.dimensions.height;
+    let width = props.dimensions.width;
+
     canvas.drawImage(video, 0, 0, width, height);
+
     let image = canvas.getImageData(0, 0, width, height);
     let pixels = _.chunk(image.data, 4);
     let data = _.chunk(pixels, image.width);
+
     setData(data);
-    _.defer(tick);
+
+    _.defer(this.tick.bind(this));
   }
 
   return (
-    <div id="grid" style={gridCss}>
-      {data.map((row, i) => row.map((pixelData, j) =>
-        <span key={`${i}-${j}`} style={{background: `rgb(${pixelData})`}}></span>
+    <div id="grid" style={this.gridCss}>
+      {this.state.data.map((row, i) => row.map((pixelData, j) =>
+        <GridItemComponent key={`${i}-${j}`} pixelData={pixelData} />
       ))}
     </div>
   );
@@ -106,6 +110,18 @@ GridComponent.propTypes = {
     height: PropTypes.number.isRequired,
     width: PropTypes.number.isRequired,
   }).isRequired
+};
+
+function GridItemComponent(props) {
+  let css = {
+    background: `rgb(${props.pixelData})`
+  };
+
+  return <span style={css}></span>;
+}
+
+GridItemComponent.propTypes = {
+  pixelData: PropTypes.arrayOf(PropTypes.number).isRequired,
 };
 
 if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
